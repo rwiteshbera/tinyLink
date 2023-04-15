@@ -40,7 +40,7 @@ func main() {
 
 	})
 
-	go kafkaconsumer.ConsumeOTP()
+	go kafkaconsumer.ConsumeOTP(server.Config)
 
 	err = server.Start()
 	if err != nil {
