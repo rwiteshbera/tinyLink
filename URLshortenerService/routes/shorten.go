@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rwiteshbera/URL-Shortener-Go/database"
 	"github.com/rwiteshbera/URL-Shortener-Go/helpers"
+	"github.com/rwiteshbera/URL-Shortener-Go/kafka_auth"
 )
 
 // A request is a struct with two fields, URL and Expiry, where URL is a string and Expiry is a
@@ -43,6 +44,8 @@ type response struct {
 func ShortenURL(incomingRoutes *gin.Engine) {
 	incomingRoutes.POST("/shorten", func(ctx *gin.Context) {
 		var req request
+
+		kafka_auth.CheckIFAuthorized(ctx)
 
 		err := ctx.BindJSON(&req)
 		if err != nil {

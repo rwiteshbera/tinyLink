@@ -9,7 +9,7 @@ import (
 
 func Authenticate(jwtSecret string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		clientToken := ctx.Request.Header.Get("authorization")
+		clientToken := ctx.Request.Header.Get("Authorization")
 
 		if clientToken == "" {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "no authorization header provided"})

@@ -37,7 +37,7 @@ func main() {
 	routes.ShortenURL(router)
 
 	if err := router.Run(":" + PORT); err != nil {
-		log.Fatalln("Failed to start the server!")
+		log.Fatalln("Failed to start the server!", err)
 	}
 
 	fmt.Println("Server is listening on " + PORT)

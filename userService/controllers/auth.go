@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 	"userService/api"
@@ -67,6 +68,7 @@ func VerifyOTP(server *api.Server) gin.HandlerFunc {
 		var userOtp models.OTP
 
 		err0 := ctx.ShouldBindJSON(&userOtp)
+		log.Println(userOtp.Otp)
 		if err0 != nil {
 			LogError(ctx, http.StatusBadRequest, err0)
 			return
@@ -74,6 +76,7 @@ func VerifyOTP(server *api.Server) gin.HandlerFunc {
 
 		// Get cookies [email]
 		currentUserEmail, err0 := ctx.Cookie("email")
+
 		if err0 != nil {
 			LogError(ctx, http.StatusBadRequest, err0)
 			return
@@ -150,6 +153,6 @@ func VerifyOTP(server *api.Server) gin.HandlerFunc {
 			}
 		}
 
-		ctx.JSON(http.StatusOK, count)
+		ctx.JSON(http.StatusBadGateway, count)
 	}
 }
