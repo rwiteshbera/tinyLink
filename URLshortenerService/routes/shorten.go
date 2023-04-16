@@ -6,13 +6,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rwiteshbera/URL-Shortener-Go/kafka_auth"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
 	"github.com/google/uuid"
 	"github.com/rwiteshbera/URL-Shortener-Go/database"
 	"github.com/rwiteshbera/URL-Shortener-Go/helpers"
-	"github.com/rwiteshbera/URL-Shortener-Go/kafka_auth"
 )
 
 // A request is a struct with two fields, URL and Expiry, where URL is a string and Expiry is a
@@ -43,9 +44,14 @@ type response struct {
 // It takes a URL as input, checks if it is valid, checks if the domain is valid, checks if the URL is using HTTPS, generates a short URL, and returns the short URL
 func ShortenURL(incomingRoutes *gin.Engine) {
 	incomingRoutes.POST("/shorten", func(ctx *gin.Context) {
-		var req request
+		is_authorized := kafka_auth.CheckIFAuthorized(ctx)
 
-		kafka_auth.CheckIFAuthorized(ctx)
+		if !is_authorized {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "not authorized"})
+			return
+		}
+
+		var req request
 
 		err := ctx.BindJSON(&req)
 		if err != nil {
@@ -67,7 +73,6 @@ func ShortenURL(incomingRoutes *gin.Engine) {
 		} else {
 			// Converting the string value of the key `ctx.ClientIP()` to an integer.
 			valueInt, _ := strconv.Atoi(value)
-
 			if valueInt <= 0 {
 				// Getting the time to live of the key `ctx.ClientIP()` from the database.
 				limit, _ := ipDatabase.TTL(database.Ctx, ctx.ClientIP()).Result()
