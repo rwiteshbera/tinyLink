@@ -14,7 +14,7 @@ func CheckIFAuthorized(server *api.Server) {
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost:9092",
 		"group.id":          "auth_group_1",
-		"auto.offset.reset": "latest",
+		"auto.offset.reset": "smallest",
 	})
 
 	if err != nil {

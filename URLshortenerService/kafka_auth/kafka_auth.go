@@ -8,13 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CheckIFAuthorized(ctx *gin.Context) {
+func CheckIFAuthorized(ctx *gin.Context) bool {
+
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost:9092",
 	})
 
 	if err != nil {
 		fmt.Printf("Failed to create producer: %s\n", err)
+		return false
 	}
 
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
@@ -26,6 +28,8 @@ func CheckIFAuthorized(ctx *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("Failed to create producer: %s\n", err)
+
+		return false
 	}
 
 	token := ctx.GetHeader("Authorization")
@@ -33,6 +37,7 @@ func CheckIFAuthorized(ctx *gin.Context) {
 	if token == "" {
 
 		log.Fatal("token not found")
+		return false
 	}
 	log.Println(token)
 
@@ -49,6 +54,7 @@ func CheckIFAuthorized(ctx *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("Failed to create producer: %s\n", err)
+		return false
 	}
 
 	<-delivery_chan
@@ -61,9 +67,11 @@ func CheckIFAuthorized(ctx *gin.Context) {
 		case *kafka.Message:
 
 			log.Println(string(e.Value))
-
+			return true
 		case *kafka.Error:
 			log.Fatal(err)
+			return false
+
 		}
 	}
 
