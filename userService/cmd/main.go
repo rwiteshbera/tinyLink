@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"userService/api"
+	"userService/kafka_auth"
 	"userService/routes"
 )
 
@@ -14,6 +15,8 @@ func main() {
 
 	routes.AuthenticationRoutes(server)
 	routes.DataRoutes(server)
+
+	go kafka_auth.CheckIFAuthorized(server)
 
 	err = server.Start()
 	if err != nil {

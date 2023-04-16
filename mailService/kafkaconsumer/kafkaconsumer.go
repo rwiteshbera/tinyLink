@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mailService/config"
+	"mailService/mailer"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -13,7 +15,7 @@ type OTP_details struct {
 	Email string
 }
 
-func ConsumeOTP() {
+func ConsumeOTP(config config.Config) {
 	topic := "OTP"
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost:9092",
@@ -44,6 +46,11 @@ func ConsumeOTP() {
 				log.Fatal(err)
 			}
 			//-------------------------------------------------------------//
+			err = mailer.SendMail(otpDetails.Email, "tinylink: emailverification", otpDetails.Otp, config)
+
+			if err != nil {
+				log.Fatal(err)
+			}
 
 		case *kafka.Error:
 			fmt.Printf("%s\n", e)
