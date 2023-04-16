@@ -1,0 +1,46 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: Tinyurl
+  annotations:
+    version: "v0.0.1"
+    description: "My apply-application application"
+spec:
+  components:
+    - name: userservice
+      type: webservice
+      properties:
+        image: irshit033/userservice:1.0.0
+        ports:
+        - port: 6000
+          expose: true
+      traits:
+      - type: napptive-ingress # Set to napptive-ingress      
+        properties:
+          port: 6000 # (Required) port  where the service is listening for incomming connections.
+          path: / # (Required) path to be exposed
+
+
+    - name: urlshortnerservice
+      type: webservice
+      properties:
+        image: irshit033/urlshortnerservice:1.0.0
+        ports:
+        - port: 9000
+          expose: true
+      traits:
+      - type: napptive-ingress # Set to napptive-ingress      
+        properties:
+          port: 9000 # (Required) port  where the service is listening for incomming connections.
+
+    - name: mailservice
+      type: webservice
+      properties:
+        image: irshit033/mailservice:1.0.0
+        ports:
+        - port: 5005
+          expose: true
+      traits:
+      - type: napptive-ingress # Set to napptive-ingress      
+        properties:
+          port: 5005 # (Required) port  where the service is listening for incomming connections.          
